@@ -6,7 +6,7 @@
 ## Alunos
 | Matrícula | Aluno |
 | -- | -- |
-| XX/XXXXXXX | Tiago Antunes |
+| 23/1011838 | Tiago Antunes Balieiro |
 | 23/1026714 | Euller Júlio da Silva |
 
 ## Apresentação do trabalho
@@ -15,7 +15,11 @@
 ## Sobre
 O presente projeto consiste na análise de conexões em um grafo direcionado para identificar grupos de entidades onde todas estão mutuamente interconectadas. Este tipo de análise estrutural é fundamental para o entendimento de redes complexas, permitindo descobrir ciclos e dependências que formam a base do sistema estudado.
 
-Os dados utilizados (dataset) representam as relações direcionadas do problema modelado. Eles consistem em vértices (entidades) e arestas direcionadas (conexões de uma entidade para outra). O dataset foi escolhido para proporcionar uma estrutura rica o suficiente, garantindo que o tempo de execução e a corretude dos algoritmos sobre grafos possam ser validados em um cenário não trivial.
+
+
+O projeto utiliza a base pública **email-Eu-core Network**, disponibilizada pelo Stanford Network Analysis Project (SNAP). O dataset representa a rede de comunicação por e-mails de uma grande instituição de pesquisa europeia, com os dados anonimizados para preservar a identidade dos participantes. Cada pessoa da instituição é modelada como um vértice de um grafo direcionado, e uma aresta `u → v` existe quando a pessoa `u` enviou pelo menos um e-mail para a pessoa `v`. A base utilizada contém **1.005 vértices e 25.571 relações**, além de informações adicionais de comunidade, nas quais cada indivíduo está associado a exatamente um dos **42 departamentos** da instituição. Essas informações permitem analisar não apenas a estrutura da rede de comunicação, mas também investigar a relação entre os Componentes Fortemente Conectados encontrados e a organização departamental da instituição.
+
+- Fonte dos dados: https://snap.stanford.edu/data/email-Eu-core.html
 
 O objetivo principal deste trabalho é modelar o dataset na forma de um grafo direcionado e extrair informações valiosas a partir dele. Mais especificamente, busca-se implementar um algoritmo eficiente para mapear as interações fechadas na rede e compreender os subgrupos existentes, aplicando na prática os conceitos teóricos de grafos.
 
