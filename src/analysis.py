@@ -15,6 +15,10 @@ class ComponentInfo(TypedDict):
     size: int
     departments: list[int]
     department_counts: dict[int, int]
+    predominant_department: int
+    department_count: int
+    purity: float
+    predominant_department_percentage: float
 
 
 def analyze_components(
@@ -53,6 +57,18 @@ def analyze_components(
                 f"Vertice {missing_vertex} sem departamento associado."
             ) from error
 
+        if not vertices:
+            raise ValueError("Um componente fortemente conectado nao pode ser vazio.")
+
+        predominant_count = max(department_counts.values())
+        # Em caso de empate, o menor identificador torna o resultado deterministico.
+        predominant_department = min(
+            department
+            for department, count in department_counts.items()
+            if count == predominant_count
+        )
+        purity = predominant_count / len(vertices)
+
         analyses.append(
             {
                 "component_id": component_id,
@@ -60,8 +76,11 @@ def analyze_components(
                 "size": len(vertices),
                 "departments": sorted(department_counts),
                 "department_counts": dict(department_counts),
+                "predominant_department": predominant_department,
+                "department_count": len(department_counts),
+                "purity": purity,
+                "predominant_department_percentage": purity * 100,
             }
         )
 
     return analyses
-
