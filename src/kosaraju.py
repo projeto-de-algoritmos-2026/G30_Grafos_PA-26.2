@@ -22,3 +22,14 @@ class KosarajuGraph:
                 
         if stack is not None:
             stack.append(v)
+
+    def get_transpose(self):
+        """
+        Retorna o grafo transposto (reverso),
+        onde todas as arestas u -> v são convertidas em v -> u.
+        """
+        g_transposed = KosarajuGraph(self.vertices)
+        for u in self.vertices:
+            for v in self.graph.get(u, []):
+                g_transposed.add_edge(v, u)
+        return g_transposed
