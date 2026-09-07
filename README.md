@@ -39,22 +39,22 @@ Para a extração dos componentes, optou-se pela utilização do **Algoritmo de 
 ## Screenshots
 A seguir estão imagens do projeto em funcionamento.
 
-![Screenshot 1](docs/Captura de tela de 2026-09-07 12-03-44.png)
+![Screenshot 1](docs/dashboard-visao-geral.png)
 *Figura 1: Dashboard de Análise: Componentes Fortemente Conectados - Métricas Gerais e Distribuição dos tamanhos dos componentes.*
 
-![Screenshot 2](docs/Captura de tela de 2026-09-07 12-04-01.png)
+![Screenshot 2](docs/dashboard-analise-departamento.png)
 *Figura 2: Análise por Departamento.*
 
 ![Screenshot 3](docs/resultado-distribuicao-cfcs.png)
 *Figura 3: Imagem da Distribuição dos tamanhos dos componentes.*
 
-![Screenshot 4](docs/Captura de tela de 2026-09-07 12-04-09.png)
+![Screenshot 4](docs/dashboard-grafo-condensacao.png)
 *Figura 4: Grafo de Condensação.*
 
 ![Screenshot 5](docs/resultado-grafo-condensacao.png)
 *Figura 5: Imagem do Grafo de Condensação.*
 
-![Screenshot 6](docs/Captura de tela de 2026-09-07 12-04-32.png)
+![Screenshot 6](docs/dashboard-exploracao-componentes.png)
 *Figura 6: Exploração Interativa dos Componentes e Análise do CFC selecionado.*
 
 ![Screenshot 7](docs/resultado-exemplo-cfc.png)
