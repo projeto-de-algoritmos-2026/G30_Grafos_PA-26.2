@@ -1,6 +1,5 @@
 # EmailCFC
 
-**Número da Lista:** 1<br>
 **Conteúdo da Disciplina:** Grafos
 
 ## Alunos
