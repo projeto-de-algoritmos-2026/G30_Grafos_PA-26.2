@@ -1,1 +1,4 @@
-#Dependências 
+# Dependências do projeto
+streamlit
+networkx
+matplotlib
