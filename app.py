@@ -1,6 +1,6 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-from collections import Counter
+from src.analysis import analyze_components, analyze_department
 from src.dataset_loader import load_email_eu_core
 from src.kosaraju import KosarajuGraph
 from src.visualization import draw_component
@@ -58,10 +58,55 @@ st.pyplot(fig)
 
 st.divider()
 
-st.header("Exploração Interativa dos Componentes")
-
-# Ordenar CFCs por tamanho decrescente
+# Preparar CFCs na mesma ordem usada pelas duas secoes interativas
 sccs_sorted = sorted(sccs, key=len, reverse=True)
+component_analyses = analyze_components(sccs_sorted, departments)
+
+st.header("Análise por Departamento")
+
+department_options = sorted(set(departments.values()))
+selected_department = st.selectbox(
+    "Selecione um departamento",
+    department_options,
+    format_func=lambda department_id: f"Departamento {department_id}",
+)
+
+if selected_department is not None:
+    department_analysis = analyze_department(
+        selected_department,
+        component_analyses,
+    )
+
+    dept_col1, dept_col2, dept_col3, dept_col4 = st.columns(4)
+    with dept_col1:
+        st.metric("Pessoas", department_analysis["person_count"])
+    with dept_col2:
+        st.metric("CFCs em que aparece", len(department_analysis["component_ids"]))
+    with dept_col3:
+        st.metric(
+            "Principal CFC",
+            f"CFC #{department_analysis['main_component_id']}",
+        )
+    with dept_col4:
+        st.metric(
+            "Membros no principal CFC",
+            f"{department_analysis['main_component_percentage']:.1f}%",
+        )
+
+    component_labels = ", ".join(
+        f"CFC #{component_id}"
+        for component_id in department_analysis["component_ids"]
+    )
+    st.write(f"**Componentes nos quais aparece:** {component_labels}")
+    st.write(
+        "**Maior concentração:** "
+        f"{department_analysis['main_component_person_count']} pessoas no "
+        f"CFC #{department_analysis['main_component_id']}"
+    )
+
+st.divider()
+
+st.header("Exploração Interativa dos Componentes")
 
 # Opção de seleção do CFC (apresentando o índice e tamanho)
 options = [f"CFC #{i} (Tamanho: {len(c)})" for i, c in enumerate(sccs_sorted)]
@@ -71,28 +116,37 @@ if selected_option:
     # Extrair o índice a partir da string de opção
     selected_index = options.index(selected_option)
     selected_scc = sccs_sorted[selected_index]
+    selected_analysis = component_analyses[selected_index]
     
     st.subheader(f"Análise do CFC Selecionado")
     
     # Calcular métricas
-    tamanho = len(selected_scc)
-    depts_presentes = [departments.get(node) for node in selected_scc]
-    contagem_depts = Counter(depts_presentes)
-    dept_predominante, count_predominante = contagem_depts.most_common(1)[0]
-    pureza = (count_predominante / tamanho) * 100
+    tamanho = selected_analysis["size"]
+    contagem_depts = selected_analysis["department_counts"]
+    dept_predominante = selected_analysis["predominant_department"]
+    pureza = selected_analysis["predominant_department_percentage"]
     
     colA, colB, colC, colD = st.columns(4)
     with colA:
         st.metric("Tamanho", tamanho)
     with colB:
-        st.metric("Depts. Presentes", len(contagem_depts))
+        st.metric("Depts. Presentes", selected_analysis["department_count"])
     with colC:
         st.metric("Dept. Predominante", f"ID {dept_predominante}")
     with colD:
         st.metric("Pureza", f"{pureza:.1f}%")
         
     st.write("**Frequência dos Departamentos neste CFC:**")
-    st.write(", ".join([f"Dept {d}: {c} pessoas" for d, c in contagem_depts.most_common()]))
+    department_frequencies = sorted(
+        contagem_depts.items(),
+        key=lambda item: (-item[1], item[0]),
+    )
+    st.write(
+        ", ".join(
+            f"Dept {department_id}: {count} pessoas"
+            for department_id, count in department_frequencies
+        )
+    )
     
     # Renderizar grafo do componente
     st.write("**Grafo do Componente:**")

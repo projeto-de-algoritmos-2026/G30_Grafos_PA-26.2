@@ -21,6 +21,17 @@ class ComponentInfo(TypedDict):
     predominant_department_percentage: float
 
 
+class DepartmentInfo(TypedDict):
+    """Resumo da distribuicao de um departamento entre os componentes."""
+
+    department_id: int
+    person_count: int
+    component_ids: list[int]
+    main_component_id: int | None
+    main_component_person_count: int
+    main_component_percentage: float
+
+
 def analyze_components(
     components: Sequence[Sequence[int]],
     department_by_person: Mapping[int, int],
@@ -84,3 +95,52 @@ def analyze_components(
         )
 
     return analyses
+
+
+def analyze_department(
+    department_id: int,
+    components: Sequence[ComponentInfo],
+) -> DepartmentInfo:
+    """Analisa como um departamento esta distribuido entre os CFCs.
+
+    O componente principal e aquele que possui a maior quantidade absoluta de
+    pessoas do departamento. A porcentagem indica qual parcela de todas as
+    pessoas do departamento esta nesse componente. Em caso de empate, e usado o
+    componente com o menor ID.
+
+    Departamentos ausentes produzem um resumo vazio, permitindo que a funcao
+    tambem seja usada com filtros ou selecoes externas ao dataset carregado.
+    """
+    appearances: list[tuple[int, int]] = []
+
+    for component in components:
+        person_count = component["department_counts"].get(department_id, 0)
+        if person_count > 0:
+            appearances.append((component["component_id"], person_count))
+
+    total_people = sum(person_count for _, person_count in appearances)
+    if not appearances:
+        return {
+            "department_id": department_id,
+            "person_count": 0,
+            "component_ids": [],
+            "main_component_id": None,
+            "main_component_person_count": 0,
+            "main_component_percentage": 0.0,
+        }
+
+    main_component_id, main_component_person_count = min(
+        appearances,
+        key=lambda appearance: (-appearance[1], appearance[0]),
+    )
+
+    return {
+        "department_id": department_id,
+        "person_count": total_people,
+        "component_ids": [component_id for component_id, _ in appearances],
+        "main_component_id": main_component_id,
+        "main_component_person_count": main_component_person_count,
+        "main_component_percentage": (
+            main_component_person_count / total_people * 100
+        ),
+    }

@@ -1,6 +1,6 @@
 import pytest
 
-from src.analysis import analyze_components
+from src.analysis import analyze_components, analyze_department
 
 
 def test_integrates_departments_into_components() -> None:
@@ -79,3 +79,48 @@ def test_uses_smallest_department_as_tie_breaker() -> None:
 def test_rejects_empty_component() -> None:
     with pytest.raises(ValueError, match="nao pode ser vazio"):
         analyze_components([[]], {})
+
+
+def test_analyzes_department_distribution_between_components() -> None:
+    components = analyze_components(
+        [[0, 1, 2], [3, 4], [5]],
+        {0: 10, 1: 10, 2: 20, 3: 10, 4: 20, 5: 30},
+    )
+
+    assert analyze_department(10, components) == {
+        "department_id": 10,
+        "person_count": 3,
+        "component_ids": [0, 1],
+        "main_component_id": 0,
+        "main_component_person_count": 2,
+        "main_component_percentage": (2 / 3) * 100,
+    }
+
+
+def test_department_analysis_uses_component_id_as_tie_breaker() -> None:
+    components = analyze_components(
+        [[0, 1, 2], [3, 4]],
+        {0: 10, 1: 10, 2: 20, 3: 20, 4: 30},
+    )
+
+    assert analyze_department(20, components) == {
+        "department_id": 20,
+        "person_count": 2,
+        "component_ids": [0, 1],
+        "main_component_id": 0,
+        "main_component_person_count": 1,
+        "main_component_percentage": 50.0,
+    }
+
+
+def test_returns_empty_summary_for_unknown_department() -> None:
+    components = analyze_components([[0, 1]], {0: 10, 1: 10})
+
+    assert analyze_department(99, components) == {
+        "department_id": 99,
+        "person_count": 0,
+        "component_ids": [],
+        "main_component_id": None,
+        "main_component_person_count": 0,
+        "main_component_percentage": 0.0,
+    }
