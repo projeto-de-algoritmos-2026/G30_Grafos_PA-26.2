@@ -1,4 +1,4 @@
-# Identificador de Componentes Fortemente Conectados
+# EmailCFC
 
 **Número da Lista:** 1<br>
 **Conteúdo da Disciplina:** Grafos
@@ -11,7 +11,7 @@
 | 23/1026714 | Euller Júlio da Silva |
 
 ## Apresentação do trabalho
-[Link para o vídeo de apresentação](https://youtu.be/)
+[Link para o vídeo de apresentação](https://youtu.be/fl6da5XLF-o)
 
 ## Sobre
 
