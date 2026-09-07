@@ -1,6 +1,10 @@
 import pytest
 
-from src.analysis import analyze_components, analyze_department
+from src.analysis import (
+    analyze_components,
+    analyze_department,
+    build_condensation_graph,
+)
 
 
 def test_integrates_departments_into_components() -> None:
@@ -124,3 +128,37 @@ def test_returns_empty_summary_for_unknown_department() -> None:
         "main_component_person_count": 0,
         "main_component_percentage": 0.0,
     }
+
+
+def test_builds_condensation_graph_with_relations_between_components() -> None:
+    components = [[0, 1], [2, 3], [4], [5]]
+    edges = [
+        (0, 1),
+        (1, 0),
+        (2, 3),
+        (3, 2),
+        (1, 2),
+        (0, 3),
+        (3, 4),
+        (4, 4),
+    ]
+
+    condensation = build_condensation_graph(components, edges)
+
+    assert condensation.get_vertices() == [0, 1, 2, 3]
+    assert condensation.get_neighbors(0) == [1]
+    assert condensation.get_neighbors(1) == [2]
+    assert condensation.get_neighbors(2) == []
+    assert condensation.get_neighbors(3) == []
+    assert condensation.vertex_count() == 4
+    assert condensation.edge_count() == 2
+
+
+def test_condensation_rejects_vertex_in_multiple_components() -> None:
+    with pytest.raises(ValueError, match="Vertice 1 pertence aos componentes 0 e 1"):
+        build_condensation_graph([[0, 1], [1, 2]], [])
+
+
+def test_condensation_rejects_edge_vertex_outside_components() -> None:
+    with pytest.raises(ValueError, match="Vertice 2.*nao pertence a nenhum CFC"):
+        build_condensation_graph([[0], [1]], [(0, 2)])

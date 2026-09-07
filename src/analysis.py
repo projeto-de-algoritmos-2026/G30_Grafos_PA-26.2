@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from typing import TypedDict
+
+from src.graph import Graph
 
 
 class ComponentInfo(TypedDict):
@@ -144,3 +146,51 @@ def analyze_department(
             main_component_person_count / total_people * 100
         ),
     }
+
+
+def build_condensation_graph(
+    components: Sequence[Sequence[int]],
+    edges: Iterable[tuple[int, int]],
+) -> Graph:
+    """Contrai cada CFC em um vertice e preserva as relacoes entre CFCs.
+
+    O vertice de cada componente recebe seu indice na sequencia de entrada. As
+    arestas cujas extremidades pertencem ao mesmo componente sao descartadas, e
+    a estrutura :class:`Graph` elimina relacoes duplicadas automaticamente.
+
+    Raises:
+        ValueError: se um componente for vazio, se um vertice aparecer em mais
+            de um componente ou se uma aresta referenciar um vertice ausente.
+    """
+    condensation = Graph()
+    component_by_vertex: dict[int, int] = {}
+
+    for component_id, component in enumerate(components):
+        condensation.add_vertex(component_id)
+        component_vertices = list(component)
+        if not component_vertices:
+            raise ValueError("Um componente fortemente conectado nao pode ser vazio.")
+
+        for vertex in component_vertices:
+            if vertex in component_by_vertex:
+                previous_component = component_by_vertex[vertex]
+                raise ValueError(
+                    f"Vertice {vertex} pertence aos componentes "
+                    f"{previous_component} e {component_id}."
+                )
+            component_by_vertex[vertex] = component_id
+
+    for source, destination in edges:
+        try:
+            source_component = component_by_vertex[source]
+            destination_component = component_by_vertex[destination]
+        except KeyError as error:
+            missing_vertex = error.args[0]
+            raise ValueError(
+                f"Vertice {missing_vertex} de uma aresta nao pertence a nenhum CFC."
+            ) from error
+
+        if source_component != destination_component:
+            condensation.add_edge(source_component, destination_component)
+
+    return condensation

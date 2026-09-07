@@ -1,9 +1,13 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-from src.analysis import analyze_components, analyze_department
+from src.analysis import (
+    analyze_components,
+    analyze_department,
+    build_condensation_graph,
+)
 from src.dataset_loader import load_email_eu_core
 from src.kosaraju import KosarajuGraph
-from src.visualization import draw_component
+from src.visualization import draw_component, draw_condensation_graph
 
 st.set_page_config(page_title="Análise de CFCs", layout="wide")
 
@@ -103,6 +107,29 @@ if selected_department is not None:
         f"{department_analysis['main_component_person_count']} pessoas no "
         f"CFC #{department_analysis['main_component_id']}"
     )
+
+st.divider()
+
+st.header("Grafo de Condensação")
+st.caption(
+    "Cada vértice representa um CFC; seu tamanho e sua cor refletem a quantidade "
+    "de pessoas. As setas representam relações de e-mail entre componentes."
+)
+
+condensation = build_condensation_graph(sccs_sorted, edges)
+condensation_col1, condensation_col2 = st.columns(2)
+with condensation_col1:
+    st.metric("CFCs condensados", condensation.vertex_count())
+with condensation_col2:
+    st.metric("Relações entre CFCs", condensation.edge_count())
+
+component_sizes = {
+    component["component_id"]: component["size"]
+    for component in component_analyses
+}
+with st.spinner("Desenhando grafo de condensação..."):
+    condensation_figure = draw_condensation_graph(condensation, component_sizes)
+    st.pyplot(condensation_figure)
 
 st.divider()
 
